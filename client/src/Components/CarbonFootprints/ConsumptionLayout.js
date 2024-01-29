@@ -1,6 +1,6 @@
 import React from "react";
 
-function ConsumptionTop() {
+function ConsumptionLayout({title, usage, }) {
   return (
     <div class="household_one_top_box">
       <div class="household_one_top_box_line"></div>
@@ -115,4 +115,4 @@ function ConsumptionTop() {
   );
 }
 
-export default ConsumptionTop;
+export default ConsumptionLayout;

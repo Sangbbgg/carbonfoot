@@ -2,7 +2,7 @@ import React from "react";
 // import logo from "../../../public/img/bbang.png"
 const Header = () => {
   return (
-    <div>
+    <header>
       <a href="/"><img src={process.env.PUBLIC_URL + "img/bbang.png"} alt="빵끗 이미지"
       style={{width:'100px',borderRadius:"50%"}} /></a>
       <a href="/Login">로그인 / </a>
@@ -18,7 +18,7 @@ const Header = () => {
       <a href="/Shop">빵끗#🛒 / </a>
       <a href="/Community">커뮤니티☘️ / </a>
       <a href="/Campaign">캠페인🌱</a>
-    </div>
+    </header>
   );
 };
 
