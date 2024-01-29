@@ -2,7 +2,11 @@ import React from "react";
 // import Styles from "../../styles/consumption.module.css";
 import ConsumptionLayout from "./ConsumptionLayout";
 function Consumption() {
-  const data = {};
+  const data = {
+    "전기":{
+      
+    },
+  };
   return (
     <div>
       <section className="household_one_step">
