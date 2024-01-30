@@ -3,8 +3,9 @@ import Consumption from "../CarbonFootprints/Consumption";
 import Result from "../CarbonFootprints/Result";
 import Practice from "../CarbonFootprints/Practice";
 
-import Styles from "../../styles/CarbonFootprint.module.css"
+import Styles from "../../styles/CarbonFootprint.module.css";
 const CarbonFootprint = () => {
+  // 상단 사용량 입력, 결과확인, 실천방향 템 컨트롤----------------------------------------
   const [activeTab, setActiveTab] = useState("consumption"); // 현재 선택된 탭
   const [showInfoBox, setShowInfoBox] = useState("flex"); // title_info_box 표시조건
 
@@ -29,6 +30,7 @@ const CarbonFootprint = () => {
         return <Consumption />;
     }
   };
+  // 종료 --------------------------------------------------------------------------------
 
   return (
     <div className="household_img_download_container">
@@ -46,7 +48,7 @@ const CarbonFootprint = () => {
       <br />
       ---------------------------------------------------------------------------------------------
       {/* 탄소발자국 계산기 */}
-      <article class="title_box">
+      <article className="title_box">
         <div>
           <div>
             <h1 className="forest_green_text">가정용 탄소발자국 계산기</h1>
@@ -91,14 +93,13 @@ const CarbonFootprint = () => {
         <p className="title_info_box" style={{ display: showInfoBox }}>
           {/* <img src="/tanso2023/dist/images/icons/information.svg" alt=""> */}
           <span>
-            <span className={Styles.weight_600}>월간 사용량(권장)</span>을 입력해주세요
+            <span className={Styles.weight_600}>월간 사용량(권장)</span>을
+            입력해주세요
           </span>
         </p>
       </div>
-
-        {/* 사용량 입력, 결과, 실천방안 탭형식 페이지 변경 */}
-        {renderContent()}
-
+      {/* 사용량 입력, 결과, 실천방안 탭형식 페이지 변경 */}
+      {renderContent()}
     </div>
   );
 };
