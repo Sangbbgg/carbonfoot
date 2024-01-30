@@ -1,6 +1,7 @@
 import React from "react";
 
-function ConsumptionLayout() {
+function ConsumptionLayout({ category }) {
+
   return (
     <div
       style={{
@@ -9,8 +10,7 @@ function ConsumptionLayout() {
         padding: "8px",
       }}
     >
-      {}
-
+      {category.label}
     </div>
   );
 }

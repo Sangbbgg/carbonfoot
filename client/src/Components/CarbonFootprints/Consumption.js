@@ -1,53 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 // import Styles from "../../styles/consumption.module.css";
 import ConsumptionLayout from "./ConsumptionLayout";
-function Consumption() {
-  // 항목별 Consumption 컴포넌트 기본 자료 ------------------------------------------------
-  const [categories, setCategories] = useState([
-    {
-      categories: {
-        electricity: {
-          unit: "kWh",
-          cost_formula: "0.4781",
-        },
-        gas: {
-          unit: "㎥",
-          cost_formula: "2.176",
-        },
-        water: {
-          unit: "㎥",
-          cost_formula: "0.237",
-        },
-        transportation: {
-          unit: "km",
-          subcategories: {
-            gasoline: {
-              cost_formula: "16.04 * 2.097",
-            },
-            diesel: {
-              cost_formula: "15.35 * 2.582",
-            },
-            lpg: {
-              cost_formula: "11.06 * 1.868",
-            },
-          },
-        },
-        waste: {
-          subcategories: {
-            kg: {
-              unit: "kg",
-              cost_formula: "0.5573",
-            },
-            l: {
-              unit: "L",
-              cost_formula: "0.171 * 0.5573",
-            },
-          },
-        },
-      },
-    },
-  ]);
-  // 종료 --------------------------------------------------------------------------------
+function Consumption({ data }) {
+  // 데이터 배열을 개별 변수로 구조 분해
+  const [electricity, gas, water, transportation, waste, kg, L] = data;
+  
   return (
     <div>
       {/* <section className="household_one_step"> */}
@@ -57,11 +14,11 @@ function Consumption() {
           {/* <article className="household_one_top"> */}
           <article>
             {/* <!-- 전기 --> */}
-            {categories.map((category) => (
-              <ConsumptionLayout key={category.categories} {...category} />
-            ))}
+            <ConsumptionLayout key={electricity.id} category={electricity} />
             {/* <!-- 가스 --> */}
+            <ConsumptionLayout key={gas.id} category={gas} />
             {/* <!-- 수도 --> */}
+            <ConsumptionLayout key={water.id} category={water} />
             {/* <!-- 교통 --> */}
           </article>
           {/* <article className="household_one_mid"> */}

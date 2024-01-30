@@ -1,13 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Consumption from "../CarbonFootprints/Consumption";
 import Result from "../CarbonFootprints/Result";
 import Practice from "../CarbonFootprints/Practice";
 
 import Styles from "../../styles/CarbonFootprint.module.css";
 const CarbonFootprint = () => {
-  // 상단 사용량 입력, 결과확인, 실천방향 템 컨트롤----------------------------------------
+  // DB연결-----------------------------------------------
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
   const [activeTab, setActiveTab] = useState("consumption"); // 현재 선택된 탭
   const [showInfoBox, setShowInfoBox] = useState("flex"); // title_info_box 표시조건
+
+  useEffect(() => {
+    // 서버에서 데이터를 가져오는 함수
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/carbonFootprint"
+        );
+        const result = await response.json();
+        setData(result);
+        setLoading(false); // 데이터가 로드되면 로딩 상태를 false로 설정
+      } catch (error) {
+        console.error("Error fetching data: " + error.message);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+  if (loading) {
+    return <div>Loading...</div>; // 데이터가 로드되는 동안 로딩 메시지를 표시
+  }
+  
+  console.log(data); // 데이터가 로드되면 콘솔에 출력
+  // 코드 종료 -------------------------------------------
+
+  // 상단 사용량 입력, 결과확인, 실천방향 텝 컨트롤----------------------------------------
+
 
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
@@ -21,7 +52,7 @@ const CarbonFootprint = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "consumption":
-        return <Consumption />;
+        return <Consumption data={data} />;
       case "result":
         return <Result />;
       case "practice":
@@ -30,7 +61,7 @@ const CarbonFootprint = () => {
         return <Consumption />;
     }
   };
-  // 종료 --------------------------------------------------------------------------------
+  // 코드 종료 --------------------------------------------------------------------------------
 
   return (
     <div className="household_img_download_container">
