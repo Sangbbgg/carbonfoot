@@ -19,6 +19,7 @@ const CarbonFootprint = () => {
         const response = await fetch(
           "http://localhost:5000/api/carbonFootprint"
         );
+        console.log(response);
         const result = await response.json();
         setData(result);
         setLoading(false); // 데이터가 로드되면 로딩 상태를 false로 설정

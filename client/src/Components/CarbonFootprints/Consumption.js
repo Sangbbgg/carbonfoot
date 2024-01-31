@@ -3,7 +3,7 @@ import React from "react";
 import ConsumptionLayout from "./ConsumptionLayout";
 function Consumption({ data }) {
   // 데이터 배열을 개별 변수로 구조 분해
-  const [electricity, gas, water, transportation, waste, kg, L] = data;
+  const [electricity, gas, water] = data;
   
   return (
     <div>
