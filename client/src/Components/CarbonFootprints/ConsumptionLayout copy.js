@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function ConsumptionLayout({ category, sub }) {
+function ConsumptionLayout({ category }) {
   // 첫 번째 input 값 (소비량)
   const [consumption, setConsumption] = useState("");
   // 두 번째 input 값 (CO₂ 발생량)
@@ -13,25 +13,7 @@ function ConsumptionLayout({ category, sub }) {
     // 두 번째 input 값 업데이트
     setCo2Emission(calculatedEmission.toFixed(2));
   };
-  console.log(sub);
-  if (category.category_name === "transportation") {
-    return (
-      <div>
-        <span>{category.label}</span>
-        <p>승용차 종류</p>
-        <div>
-          {sub.map((item) => (
-            <div key={item.id}>
-              <input type="radio" value={item.id - 5} />
-              <p>{item.sublabel}</p>
-            </div>
-          ))}
-          <input type="radio" value="3" />
-          <p>승용차 없음</p>
-        </div>
-      </div>
-    );
-  }
+
   return (
     <div>
       <span>{category.label}</span>

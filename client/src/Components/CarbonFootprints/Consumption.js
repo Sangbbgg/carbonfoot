@@ -3,7 +3,8 @@ import React from "react";
 import ConsumptionLayout from "./ConsumptionLayout";
 function Consumption({ data }) {
   // 데이터 배열을 개별 변수로 구조 분해
-  const [electricity, gas, water] = data;
+  const [electricity, gas, water, transportation] = data;
+  const filteredData = data.filter(item => item.parent_category_id === 4);
   
   return (
     <div>
@@ -20,6 +21,7 @@ function Consumption({ data }) {
             {/* <!-- 수도 --> */}
             <ConsumptionLayout key={water.id} category={water} />
             {/* <!-- 교통 --> */}
+            <ConsumptionLayout key={transportation.id} category={transportation} sub={filteredData}/>
           </article>
           {/* <article className="household_one_mid"> */}
           <article>{/* <!-- 폐기물 --> */}</article>
