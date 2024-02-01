@@ -5,10 +5,10 @@ import Practice from "../CarbonFootprints/Practice";
 
 import Styles from "../../styles/CarbonFootprint.module.css";
 const CarbonFootprint = () => {
-  // DB연결-----------------------------------------------
+  // DB연결-------------------------------------------------------------------------------
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   const [activeTab, setActiveTab] = useState("consumption"); // 현재 선택된 탭
   const [showInfoBox, setShowInfoBox] = useState("flex"); // title_info_box 표시조건
 
@@ -27,19 +27,17 @@ const CarbonFootprint = () => {
         console.error("Error fetching data: " + error.message);
       }
     };
-  
+
     fetchData();
   }, []);
-  
+  // 코드 종료 ---------------------------------------------------------------------------
+  // 이슈 렌더링시에 빈 오브젝트 출력확인--------------------------------------------------
   if (loading) {
     return <div>Loading...</div>; // 데이터가 로드되는 동안 로딩 메시지를 표시
   }
-  
   // console.log(data); // 데이터가 로드되면 콘솔에 출력
-  // 코드 종료 -------------------------------------------
 
-  // 상단 사용량 입력, 결과확인, 실천방향 텝 컨트롤----------------------------------------
-
+  // 상단 사용량 입력, 결과확인, 실천방향 탭 컨트롤----------------------------------------
 
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);

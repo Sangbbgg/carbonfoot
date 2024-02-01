@@ -1,26 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 function Consumption({ data }) {
   console.log(data);
-  const [consumption, setConsumption] = useState({
-    electricity: 0,
-    gas: 0,
-    water: 0,
-    transportation: 0,
-    waste: 0,
-  });
-  const [co2Emission, setCo2Emission] = useState({
-    electricity: 0,
-    gas: 0,
-    water: 0,
-    transportation: 0,
-    waste: 0,
-  });
 
-  const handelInputChange = (e) => {
-    const{category_name,value} =e.target.value;
-
-  };
   return (
     <div>
       {/* 전기 */}
@@ -169,10 +151,7 @@ function Consumption({ data }) {
       <div>
         <p>CO₂발생량</p>
       </div>
-      <div>
-        <input type="number" />
-        <span>kg/월</span>
-      </div>
+      <div><input type="number"/><span>kg/월</span></div>
     </div>
   );
 }
