@@ -1,13 +1,14 @@
-import React from 'react'
+import React from "react";
 
-function Result() {
+function Result({ resultData }) {
+  console.log(resultData);
   return (
     <div>
       <section className="household_two_step">
-      <p>결과 페이지</p>
+        <p>결과 페이지</p>
       </section>
     </div>
-  )
+  );
 }
 
-export default Result
+export default Result;
