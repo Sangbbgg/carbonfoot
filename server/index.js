@@ -14,14 +14,15 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 
 // MySQL 연결 설정
 const connection = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "1234",
-  database: "ezteam2",
-  // host: "1.243.246.15",
+  // host: "127.0.0.1",
   // user: "root",
   // password: "1234",
   // database: "ezteam2",
+  host: "1.243.246.15",
+  user: "root",
+  password: "1234",
+  database: "ezteam2",
+  port: 5005,
 });
 
 // MySQL 연결
