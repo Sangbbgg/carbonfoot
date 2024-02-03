@@ -18,6 +18,10 @@ const connection = mysql.createConnection({
   user: "root",
   password: "1234",
   database: "ezteam2",
+  // host: "1.243.246.15",
+  // user: "root",
+  // password: "1234",
+  // database: "ezteam2",
 });
 
 // MySQL 연결

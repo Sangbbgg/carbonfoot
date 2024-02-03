@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-function Consumption({ data }) {
-  console.log(data);
+function Consumption({
+  data,
+  consumptionData: initialConsumptionData,
+  onResultSubmit,
+  onConsumptionDataChange,
+  selectedTransportationOption,
+  onSelectedTransportationOption,
+}) {
+  // 데이터 확인용----------------------------------------------------------
+  useEffect(() => {
+    console.log("서버 획득 데이터셋 : ", data);
+    console.log("교통 분류 데이터셋_가공: ", transportationOptions);
+    console.log(
+      "교통 선택값(0:휘발유,1:경유,2:LPG,3:차없음) : ",
+      selectedTransportationOption
+    );
+  }, []);
+  // -----------------------------------------------------------------------
   const [consumption, setConsumption] = useState({
     electricity: "",
     gas: "",
     water: "",
     transportation: "",
-    radioOption: "0",
-    wasteInput1: "",
-    wasteInput2: "",
+    waste: "",
   });
-
   const [co2Emission, setCo2Emission] = useState({
     electricity: 0,
     gas: 0,
@@ -21,283 +33,185 @@ function Consumption({ data }) {
     waste: 0,
   });
 
-  const [totalCO2Emission, setTotalCO2Emission] = useState(0);
+  const [totalCO2Emission, setTotalCO2Emission] = useState("");
 
-  const handelInputChange = (e) => {
-    const { name, value } = e.target;
-    setConsumption({
+  const transportationOptions = data
+    .filter((category) => category.parent_category_id === 4)
+    .map((option, index) => ({
+      ...option,
+      id: index,
+    }));
+
+  useEffect(() => {
+    const initialData = initialConsumptionData || data;
+    if (initialData) {
+      setConsumption({
+        electricity: initialData.electricity || "",
+        gas: initialData.gas || "",
+        water: initialData.water || "",
+        transportation: initialData.transportation || "",
+        waste: initialData.waste || "",
+      });
+    }
+  }, [data, initialConsumptionData]);
+
+  useEffect(() => {
+    const electricityCO2 = consumption.electricity * 0.5;
+    const gasCO2 = consumption.gas * 0.5;
+    const waterCO2 = consumption.water * 0.5;
+
+    const isOptionValid =
+      selectedTransportationOption >= 0 &&
+      selectedTransportationOption < transportationOptions.length;
+    const transportationCO2 = isOptionValid
+      ? consumption.transportation *
+        parseFloat(
+          transportationOptions[selectedTransportationOption].cost_formula
+        )
+      : 0;
+
+    const wasteCO2 = consumption.waste * 0.5;
+
+    setCo2Emission({
+      electricity: electricityCO2,
+      gas: gasCO2,
+      water: waterCO2,
+      transportation: transportationCO2,
+      waste: wasteCO2,
+    });
+
+    const total =
+      electricityCO2 + gasCO2 + waterCO2 + transportationCO2 + wasteCO2;
+    setTotalCO2Emission(total);
+  }, [consumption, data, selectedTransportationOption]);
+
+  const handleInputChange = (e, type) => {
+    const value = e.target.value;
+    setConsumption((prevConsumption) => ({
+      ...prevConsumption,
+      [type]: value,
+    }));
+
+    onConsumptionDataChange({
       ...consumption,
-      [name]: value || "",
+      [type]: value,
     });
   };
 
-  useEffect(() => {
-    let wasteValue = 0;
+  const handleSelectedTransportationOptionChange = (
+    newSelectedTransportationOption
+  ) => {
+    setConsumption((prevConsumption) => ({
+      ...prevConsumption,
+      transportation: "",
+    }));
 
-    const val1 = 0.176;
-    const val2 = 0.5573;
+    onSelectedTransportationOption(newSelectedTransportationOption);
+  };
 
-    if (!isNaN(consumption.wasteInput1) && consumption.wasteInput1 !== "") {
-      wasteValue = consumption.wasteInput1 * data[8].cost_formula;
-    } else if (
-      !isNaN(consumption.wasteInput2) &&
-      consumption.wasteInput2 !== ""
+  const handleResultSubmit = () => {
+    const transportationEmission =
+      selectedTransportationOption === 3 ? true : co2Emission.transportation;
+    if (
+      co2Emission.electricity === 0 ||
+      co2Emission.gas === 0 ||
+      co2Emission.water === 0 ||
+      transportationEmission === 0 ||
+      co2Emission.waste === 0
     ) {
-      wasteValue = consumption.wasteInput2 * val1 * val2; // data[9].cost_formula; //Nan값출력 말 XX 않듣는 시키
+      alert("모든 칸을 입력해 주세요!");
+      return;
     }
 
-    setCo2Emission({
-      ...co2Emission,
-      electricity: (consumption.electricity * data[0].cost_formula).toFixed(1),
-      gas: (consumption.gas * data[1].cost_formula).toFixed(1),
-      water: (consumption.water * data[2].cost_formula).toFixed(1),
-      transportation: (
-        consumption.transportation * data[consumption.radioOption].cost_formula
-      ).toFixed(1),
-      waste: wasteValue.toFixed(1),
-    });
-
-    // total값 저장
-    const total =
-      parseFloat(co2Emission.electricity) +
-      parseFloat(co2Emission.gas) +
-      parseFloat(co2Emission.water) +
-      parseFloat(co2Emission.transportation) +
-      parseFloat(co2Emission.waste);
-
-    setTotalCO2Emission(total);
-  }, [consumption, totalCO2Emission]);
-
-  // 계산 결과값 확인
-  console.log(co2Emission);
-  console.log(totalCO2Emission.toFixed(1));
-
-  //
-  const navigate = useNavigate();
-
-  const handleButtonClick = () => {
-    // Navigate to the 'Result' page and pass the values as state
-    navigate("/result", {
-      state: {
-        co2Emission: co2Emission,
-        totalCO2Emission: totalCO2Emission.toFixed(1),
-      },
-    });
+    const resultData = {
+      consumption,
+      co2Emission,
+      totalCO2Emission,
+      selectedTransportationOption,
+    };
+    onResultSubmit(resultData);
   };
   return (
     <div>
-      {/* 전기 */}
       <div>
-        <span>{data[0].label}</span>
-        <p>{data[0].label}사용량</p>
+        전기
         <input
           type="number"
-          className="elect_usage"
-          aria-label={`${data[0].label} 사용량 입력`}
           placeholder="숫자 입력..."
-          name={data[0].category_name}
           value={consumption.electricity}
-          onChange={handelInputChange}
+          onChange={(e) => handleInputChange(e, "electricity")}
         />
-        <span>{data[0].unit}/월</span>
-        <p>CO₂발생량</p>
-        <input type="number" value={co2Emission.electricity} readOnly />
-        <span>kg/월</span>
-        <div>
-          <span>
-            {data[0].label} CO₂발생량 | ({data[0].label} 사용량{" "}
-            {data[0].cost_formula})
-          </span>
-        </div>
+        <input value={co2Emission.electricity.toFixed(1)} readOnly />
       </div>
-      {/* 가스 */}
       <div>
-        <span>{data[1].label}</span>
-        <p>{data[1].label}사용량</p>
+        가스
         <input
           type="number"
-          className="elect_usage"
-          aria-label={`${data[1].label} 사용량 입력`}
           placeholder="숫자 입력..."
-          name={data[1].category_name}
           value={consumption.gas}
-          onChange={handelInputChange}
+          onChange={(e) => handleInputChange(e, "gas")}
         />
-        <span>{data[1].unit}/월</span>
-        <p>CO₂발생량</p>
-        <input type="number" value={co2Emission.gas} readOnly />
-        <span>kg/월</span>
-        <div>
-          <span>
-            {data[1].label} CO₂발생량 | ({data[1].label} 사용량{" "}
-            {data[1].cost_formula})
-          </span>
-        </div>
+        <input value={co2Emission.gas.toFixed(1)} readOnly />
       </div>
-      {/* 수도 */}
       <div>
-        <span>{data[2].label}</span>
-        <p>{data[2].label}사용량</p>
+        수도
         <input
           type="number"
-          className="elect_usage"
-          aria-label={`${data[2].label} 사용량 입력`}
           placeholder="숫자 입력..."
-          name={data[2].category_name}
           value={consumption.water}
-          onChange={handelInputChange}
+          onChange={(e) => handleInputChange(e, "water")}
         />
-        <span>{data[2].unit}/월</span>
-        <p>CO₂발생량</p>
-        <input type="number" value={co2Emission.water} readOnly />
-        <span>kg/월</span>
-        <div>
-          <span>
-            {data[2].label} CO₂발생량 | ({data[2].label} 사용량{" "}
-            {data[2].cost_formula})
-          </span>
-        </div>
+        <input value={co2Emission.water.toFixed(1)} readOnly />
       </div>
-      {/* 교통 */}
       <div>
-        <span>{data[3].label}</span>
-        <p>승용차 종류</p>
-        <div>
+        교통
+        {transportationOptions.map((option) => (
+          <label key={option.id}>
+            <input
+              type="radio"
+              name="transportationOption"
+              value={option.id}
+              checked={selectedTransportationOption === option.id}
+              onChange={() => handleSelectedTransportationOptionChange(option.id)}
+            />
+            {option.label}
+          </label>
+        ))}
+        <label>
           <input
             type="radio"
-            name="transportation"
-            value="0"
-            checked={consumption.radioOption === "0"}
-            onChange={() =>
-              setConsumption({ ...consumption, radioOption: "0" })
-            }
-          />
-          <label>{data[4].sublabel}</label>
-        </div>
-        <div>
-          <input
-            type="radio"
-            name="transportation"
-            value="1"
-            checked={consumption.radioOption === "1"}
-            onChange={() =>
-              setConsumption({ ...consumption, radioOption: "1" })
-            }
-          />
-          <label>{data[5].sublabel}</label>
-        </div>
-        <div>
-          <input
-            type="radio"
-            name="transportation"
-            value="2"
-            checked={consumption.radioOption === "2"}
-            onChange={() =>
-              setConsumption({ ...consumption, radioOption: "2" })
-            }
-          />
-          <label>{data[6].sublabel}</label>
-        </div>
-        <div>
-          <input
-            type="radio"
-            name="transportation"
+            name="transportationOption"
             value="3"
-            checked={consumption.radioOption === "3"}
-            onChange={() =>
-              setConsumption({ ...consumption, radioOption: "3" })
-            }
+            checked={selectedTransportationOption === 3} // 값 수정
+            onChange={() => handleSelectedTransportationOptionChange(3)} // 추가
           />
-          <label>승용차 없음</label>
-        </div>
+          차량 없음
+        </label>
         <input
           type="number"
-          className="elect_usage"
-          aria-label={`${data[3].label} 사용량 입력`}
           placeholder="숫자 입력..."
-          name={data[3].category_name}
           value={consumption.transportation}
-          onChange={handelInputChange}
+          onChange={(e) => handleInputChange(e, "transportation")}
+          disabled={selectedTransportationOption === 3}
         />
-        <span>{data[3].unit}/월</span>
-        <p>CO₂발생량</p>
-        <input type="number" value={co2Emission.transportation} readOnly />
-        <span>kg/월</span>
-        <div>
-          <span>
-            {data[3].label} CO₂발생량 | {data[4].label} : (이동거리 /{" "}
-            {data[4].cost_formula})
-          </span>
-          <span>
-            {data[3].label} CO₂발생량 | {data[5].label} : (이동거리 /{" "}
-            {data[5].cost_formula})<br />
-            {data[3].label} CO₂발생량 | {data[6].label} : (이동거리 /{" "}
-            {data[6].cost_formula})
-          </span>
-        </div>
+        <input value={co2Emission.transportation.toFixed(1)} readOnly />
       </div>
-      {/* 폐기물 */}
       <div>
-        <span>{data[7].label}</span>
-        <p>폐기물 종류</p>
-        <div>
-          <input type="radio" value="0" checked={true} readOnly />
-          <label>생활 {data[7].label}</label>
-        </div>
-        <p>{data[7].label} 사용량</p>
+        폐기물
         <input
           type="number"
-          className="elect_usage"
-          aria-label={`${data[7].label} 사용량 입력`}
           placeholder="숫자 입력..."
-          value={consumption.wasteInput1.toString()}
-          onChange={(e) =>
-            setConsumption({
-              ...consumption,
-              wasteInput1: e.target.value,
-              wasteInput2: "",
-            })
-          }
+          value={consumption.waste}
+          onChange={(e) => handleInputChange(e, "waste")}
         />
-        <span>{data[8].unit}/월</span>
-        <input
-          type="number"
-          className="elect_usage"
-          aria-label={`${data[7].label} 사용량 입력`}
-          placeholder="숫자 입력..."
-          value={consumption.wasteInput2.toString()}
-          onChange={(e) =>
-            setConsumption({
-              ...consumption,
-              wasteInput1: "",
-              wasteInput2: e.target.value,
-            })
-          }
-        />
-        <span>{data[9].unit}/월</span>
-
-        <p>CO₂발생량</p>
-        <input type="number" value={co2Emission.waste} readOnly />
-        <span>kg/월</span>
-        <div>
-          <span>
-            생활 {data[7].label} CO₂발생량 | ({data[7].label} 사용량 *{" "}
-            {data[8].cost_formula})
-          </span>
-        </div>
+        <input value={co2Emission.waste.toFixed(1)} readOnly />
       </div>
       <div>
-        <h3>전체 에너지원 CO₂ 발생 합계</h3>
-      </div>
-      <div>
-        <p>CO₂발생량</p>
-      </div>
-      <div>
-        <input type="number" value={totalCO2Emission.toFixed(1)} readOnly />
-        <span>kg/월</span>
+        전체 에너지원 CO₂ 발생 합계
+        <input value={totalCO2Emission} readOnly />
       </div>
       <button>
-        <a href="" onClick={handleButtonClick}>
+        <a href="#" onClick={handleResultSubmit}>
           제출하기
         </a>
       </button>
