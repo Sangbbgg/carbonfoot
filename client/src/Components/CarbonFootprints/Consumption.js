@@ -16,6 +16,7 @@ function Consumption({
       "교통 선택값(0:휘발유,1:경유,2:LPG,3:차없음) : ",
       selectedTransportationOption
     );
+    console.log("폐기물 입력종류_가공: ", wastetype);
   }, []);
   // -----------------------------------------------------------------------
   const [consumption, setConsumption] = useState({
@@ -37,6 +38,13 @@ function Consumption({
 
   const transportationOptions = data
     .filter((category) => category.parent_category_id === 4)
+    .map((option, index) => ({
+      ...option,
+      id: index,
+    }));
+
+  const wastetype = data
+    .filter((category) => category.parent_category_id === 8)
     .map((option, index) => ({
       ...option,
       id: index,
@@ -172,7 +180,9 @@ function Consumption({
               name="transportationOption"
               value={option.id}
               checked={selectedTransportationOption === option.id}
-              onChange={() => handleSelectedTransportationOptionChange(option.id)}
+              onChange={() =>
+                handleSelectedTransportationOptionChange(option.id)
+              }
             />
             {option.label}
           </label>
@@ -204,6 +214,12 @@ function Consumption({
           value={consumption.waste}
           onChange={(e) => handleInputChange(e, "waste")}
         />
+        <label>
+          <input type="radio" name="waste" value="0" checked={true} readOnly />
+          생활 폐기물
+        </label>
+        {/* 작성 부분 */}
+
         <input value={co2Emission.waste.toFixed(1)} readOnly />
       </div>
       <div>
